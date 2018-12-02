@@ -1,0 +1,70 @@
+from PIL import Image
+import rsa
+from PIL import Image
+import numpy as np
+import functools
+import sys
+import pyDes
+
+
+
+image=Image.open("output.png")
+# img_array=img.load()
+# for arr in img_array:
+#     print(arr)
+
+width = image.width
+height = image.height
+image_list = []
+# ft = open('C:\\Users\\haowei.song18\\Desktop\\409\\'+'rgb.txt',  'a+')
+for x in range(height):
+    scanline_list = []
+    for y in range(width):
+        pixel = image.getpixel((y, x))
+        scanline_list.append(pixel)
+    image_list.append(scanline_list)
+
+print(image_list)
+# ft.write(str(image_list))
+# ft.close()
+# Image.fromarray(image_list).save(chenggong.png)
+
+(pub_key, priv_key) = rsa.newkeys(1024)  # 生成rsa密钥对
+des_key = '1234qwer'  #  8 bytes des secret key
+des_IV = 'asdfzxcv'  # Enter the 8-byte CBC mode initial value
+des_data = des_key + des_IV  # connect the two
+enc_des = rsa.encrypt(des_data.encode('utf-8'), pub_key)  # character after encryption 
+des = pyDes.des(des_key, pyDes.CBC, des_IV, pad=None, padmode=pyDes.PAD_PKCS5)  # define des instance
+
+# DES encryption file
+
+dataRow = str(image_list)
+# print(dataRow)
+# dataCol = str(im[0, col])
+#
+# dataColor = str(im[color])
+enc_dataRow = des.encrypt(dataRow)
+print(enc_dataRow)
+# enc_dataCol = des.encrypt(dataCol)
+# enc_dataColor = des.encrypt(dataColor)
+
+
+with open('enc_dataRowFile.txt', 'wb') as f:
+    [f.write(x) for x in (enc_des, enc_dataRow)]  # write()只接受一个参数，使用列表生成式将密钥密文和文件密文写入，也可拆开写
+    f.close()
+    
+with open('enc_dataRowFile.txt', 'rb') as f:
+    wait_dec_des, wait_dec_data = [f.read(x) for x in (128, -1)]
+        # The key ciphertext is 128 bytes, and the rest is plaintext ciphertext
+    f.close()
+    #Decrypt the DES key and the initial value
+dec_des = rsa.decrypt(wait_dec_des, priv_key).decode('utf-8')
+des_key, des_IV = dec_des[:8], dec_des[8:]
+
+dec_data = des.decrypt(wait_dec_data)
+# print(dec_data)
+with open('realRow.doc', 'wb') as f:
+    dec_data = des.decrypt(wait_dec_data)
+    print(dec_data)
+    f.write(dec_data)
+    f.close()
