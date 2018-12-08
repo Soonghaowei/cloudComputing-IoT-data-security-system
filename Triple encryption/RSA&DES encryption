@@ -16,7 +16,7 @@ image=Image.open("output.png")
 width = image.width
 height = image.height
 image_list = []
-# ft = open('C:\\Users\\haowei.song18\\Desktop\\409\\'+'rgb.txt',  'a+')
+# ft = open('C:\\Users\\Desktop\\409\\'+'rgb.txt',  'a+')
 for x in range(height):
     scanline_list = []
     for y in range(width):
